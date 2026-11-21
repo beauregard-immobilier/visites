@@ -441,7 +441,7 @@ setMode();fit();
 if(q.get("ui")==="0"){ch.style.visibility="hidden";$("cta").style.visibility="visible";$("dots").style.visibility="hidden";$("hint").style.visibility="hidden"}
 if(q.has("t")){document.body.classList.add("still");target=parseFloat(q.get("t"));hintOn=Math.abs(target-PAL[0])<.05;render(target);if(q.get("ui")==="0"){ch.style.visibility="hidden"}}
 else if(EMB){
-  Promise.race([Promise.all([...document.images].map(i=>i.decode?i.decode().catch(()=>0):0)),new Promise(r=>setTimeout(r,2500))]).then(()=>{last=performance.now();document.body.classList.add("ok");intro();wake();parent.postMessage({sit:"ready"},"*")});
+  Promise.race([Promise.all([...document.images].map(i=>i.decode?i.decode().catch(()=>0):0)),new Promise(r=>setTimeout(r,6000))]).then(()=>{last=performance.now();document.body.classList.add("ok");intro();wake();parent.postMessage({sit:"ready"},"*")});
   addEventListener("message",e=>{const d=e.data;if(!d||!d.sitp)return;
     if(d.sitp==="rect")RECT=d;
     if(d.sitp==="replay"){released=false;endHold=0;document.body.classList.remove("rel");gestured=false;hintOn=false;last=performance.now();intro();wake();parent.postMessage({sit:"ready"},"*")}});
