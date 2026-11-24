@@ -37,6 +37,10 @@ button{font-family:inherit;font-variant-numeric:inherit;font-feature-settings:in
 #c-etg{transform-origin:50% 50%}
 #zoom{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
 .jeu{position:absolute;inset:0;visibility:hidden}.jeu.vis{visibility:visible}
+/* Garde du 24/11/2026 : dessinerImgs pose « visibility:visible » sur l'image affichée, et une valeur posée sur l'enfant l'emporte sur la couche masquée. Depuis le 21/11, en quittant une coupe
+   (retour à l'hôtel, séquence Situation, ancre), l'étage restait affiché par-dessus la vue de l'ensemble, sans retour ni rotation possibles. Une image d'une couche ou d'un
+   jeu masqué est donc masquée sans exception ; la construction refuse une page sans cette règle. */
+.couche:not(.vis) img,.jeu:not(.vis) img{visibility:hidden!important}
 
 /* Bâtiments (niveau ensemble) : au survol, le reste de l'image s'estompe sous un voile clair, le bâtiment reste net, cerné d'un liseré fin */
 .voile{fill:rgba(241,235,224,.35);fill-rule:evenodd;opacity:0;transition:opacity .3s ease;pointer-events:none}
