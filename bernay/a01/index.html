@@ -13,7 +13,11 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1f2b3d">
-<style>html, body { margin: 0; height: 100%; } img { max-width: 100%; } [hidden] { display: none !important; }</style>
+<style>html, body { margin: 0; height: 100%; } img { max-width: 100%; } [hidden] { display: none !important; }/* Entrée par le dessus depuis la page du programme (?entree=dessus) : interface masquée pendant la descente, puis fondu */
+body.entree #plan, body.entree #barre, body.entree #titre, body.entree #reperes, body.entree #outils, body.entree #aide, body.entree #mention, body.entree #lieu, body.entree #avis { opacity: 0 !important; pointer-events: none !important; }
+body.entree-fin #plan, body.entree-fin #barre, body.entree-fin #titre, body.entree-fin #reperes, body.entree-fin #outils, body.entree-fin #mention, body.entree-fin #lieu { animation: vvApparait .9s ease both; }
+@keyframes vvApparait { from { opacity: 0; } to { opacity: 1; } }
+</style>
 <title>Gabelle, visite du lot A01</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&family=Source+Sans+3:wght@400;600&display=swap');
@@ -1345,9 +1349,32 @@ function nomCourt(nom) {
     majChamp();
   }, { passive: false });
 
+  // ---- Entrée par le dessus (page du programme, ?entree=dessus ; 26/11/2026) : la visite s'ouvre en regardant le sol depuis le haut, interface
+  // masquée, signale à la page qu'elle est prête, puis se redresse jusqu'à la vue de départ dès que la page le demande (ou après 2,5 s).
+  const ENTREE = !reduit && /[?&]entree=dessus\b/.test(location.search);
+  let entree = null;
+  function preparerEntree() {
+    document.body.classList.add('entree');
+    entree = { cible: { pitch: vue.pitch, champ: vue.champ, yaw: vue.yaw }, depart: { pitch: -Math.PI / 2 + 0.01, champ: 100, yaw: vue.yaw - 0.35 }, t0: 0, d: 2100 };
+    vue.pitch = entree.depart.pitch; vue.champ = entree.depart.champ; vue.yaw = entree.depart.yaw; majChamp();
+    try { parent.postMessage({ vv: 'pret' }, '*'); } catch (e) { /* page ouverte seule */ }
+    const go = () => { if (entree && !entree.t0) entree.t0 = performance.now(); };
+    addEventListener('message', (e) => { if (e.data && e.data.vvp === 'go') go(); });
+    setTimeout(go, 2500);
+  }
+  function avancerEntree(now) {
+    if (!entree || !entree.t0) return;
+    const u = Math.min(1, (now - entree.t0) / entree.d), e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+    const A = entree.depart, B = entree.cible;
+    vue.pitch = A.pitch + (B.pitch - A.pitch) * e; vue.yaw = A.yaw + (B.yaw - A.yaw) * e; vue.champ = A.champ + (B.champ - A.champ) * e;
+    majChamp(); sale = true;
+    if (u >= 1) { entree = null; document.body.classList.remove('entree'); document.body.classList.add('entree-fin'); }
+  }
+
   // ---- Boucle d'affichage : rendu seulement quand quelque chose a changé ----
   function boucle(now) {
     avancerTransition(now);
+    avancerEntree(now);
     if (sale) {
       sale = false;
       camera.rotation.set(vue.pitch, vue.yaw + Math.PI, 0);
@@ -1375,6 +1402,7 @@ function nomCourt(nom) {
     courant = ouvert;
     vue.yaw = cap(ouvert.pos, ouvert.regarde);
     vue.pitch = 0;
+    if (ENTREE) preparerEntree();
     sphereA.uniforms.uTex.value = panos[ouvert.id];
     majInterface();
     construireReperes();

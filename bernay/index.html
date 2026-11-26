@@ -316,20 +316,8 @@ button{font-family:inherit;font-variant-numeric:inherit;font-feature-settings:in
 .h-film{border:1px solid var(--brique);background:none;color:var(--brique);border-radius:999px;padding:14px 30px;font:inherit;font-size:14px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
 .h-film:hover{background:var(--brique);color:#fff}
 @media (prefers-reduced-motion:reduce){.h-fond{clip-path:none}.h-fond i{transform:none}.h-hero.ouvre .h-fond,.h-hero.ouvre .h-fond i,.h-hero.ouvre .h-m>span,.h-hero.ouvre .h-sur,.h-hero.ouvre .h-an,.h-hero.ouvre .h-an i,.h-hero.ouvre .h-def{animation:none}.h-m>span{transform:none}.h-sur,.h-an,.h-def{opacity:1}.h-an i{transform:none}.hr{opacity:1;transform:none;transition:none}.h-cache{clip-path:none;transition:none}.h-par img,.h-carte .h-cache img{transform:none;transition:none}.lt{opacity:1;transform:none;transition:none}.h-steps li{opacity:1!important;transition:none}.h-d{transition:none}.h-dot{transition:none}.h-trait{transform:scaleY(1)!important}}
-/* Entrée dans la visite virtuelle (demande du 26/11/2026) : plongée sur le logement dans la coupe, puis un cercle s'ouvre depuis le logement sur la première
-   pièce de la visite (image d'aperçu de la visite), qui se rapproche ; la visite à 360° prend le relais en fondu. */
-#plonge{position:fixed;inset:0;z-index:120;pointer-events:none;visibility:hidden;opacity:1}
-#plonge.on{visibility:visible}
-#plonge .pv{position:absolute;inset:0;background:#1f2b3d center/cover no-repeat;clip-path:circle(0px at var(--x) var(--y));transform:scale(1.4);transform-origin:var(--x) var(--y);will-change:clip-path,transform}
-#plonge.ouvre .pv{transition:clip-path 1.05s cubic-bezier(.7,0,.2,1),transform 1.9s cubic-bezier(.16,.7,.2,1);clip-path:circle(160vmax at var(--x) var(--y));transform:scale(1)}
-#plonge .anneau{position:absolute;left:var(--x);top:var(--y);width:0;height:0;border:1.5px solid rgba(248,245,238,.95);border-radius:50%;transform:translate(-50%,-50%);opacity:0}
-#plonge.ouvre .anneau{animation:anneau 1.05s cubic-bezier(.7,0,.2,1) forwards}
-@keyframes anneau{0%{width:0;height:0;opacity:1}100%{width:320vmax;height:320vmax;opacity:0}}
-#plonge .lib{position:absolute;left:0;right:0;bottom:13vh;text-align:center;color:#F8F5EE;font-family:var(--serif);font-size:clamp(24px,3.2vw,44px);line-height:1.1;text-shadow:0 2px 20px rgba(0,0,0,.5);opacity:0;transform:translateY(14px);transition:opacity .7s .6s,transform .7s .6s}
-#plonge .lib small{display:block;margin-bottom:10px;font-family:var(--sans);font-size:12px;letter-spacing:.34em;text-transform:uppercase}
-#plonge.ouvre .lib{opacity:1;transform:none}
-#plonge.part{opacity:0;transition:opacity .7s ease}
-@media (prefers-reduced-motion:reduce){#plonge{display:none}}
+/* Entrée dans la visite virtuelle par le dessus (26/11/2026) : la visite apparaît en fondu au moment où elle regarde le sol depuis le haut */
+#sur-visite.entree{transition:opacity .7s ease}#sur-visite.entree header{opacity:0}
 /* Le film */
 .film-corps{flex:1;display:flex;flex-direction:column;min-height:0}
 #film-cadre{flex:1;border:0;width:100%;background:#000;min-height:0}
@@ -488,7 +476,6 @@ button.esc{cursor:pointer;pointer-events:auto;font-family:var(--sans)}button.esc
   <div class="sur clair" id="sur-hist" aria-hidden="true" role="dialog" aria-label="Histoire de l'hôtel"><header><h3>Histoire</h3><span style="flex:1"></span><button class="puce" id="hist-x" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header><div class="hist" id="hist"></div></div>
   <div class="sur clair" id="sur-part" aria-hidden="true" role="dialog" aria-label="Nos partenaires"><header><h3>Partenaires</h3><span style="flex:1"></span><button class="puce" id="part-x" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header><div class="part" id="part"></div></div>
   <div class="sur" id="sur-film" aria-hidden="true" role="dialog" aria-label="Le film du programme"><header><h3>Le film</h3><a id="film-yt" target="_blank" rel="noopener">Voir sur YouTube ↗</a><button class="puce" id="film-x" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header><div class="film-corps"><div id="film-zone" style="flex:1;display:flex;min-height:0"></div><div id="film-repli"><p>Le lecteur de YouTube n'accepte pas d'être intégré dans une page ouverte depuis un fichier. Le film s'ouvre dans un nouvel onglet.</p><a class="btn" id="film-yt2" target="_blank" rel="noopener">Voir le film sur YouTube</a></div></div></div>
-  <div id="plonge" aria-hidden="true"><div class="pv"></div><div class="anneau"></div><div class="lib"></div></div>
   <div class="sur" id="sur-visite" aria-hidden="true"><header><h3 id="vis-t"></h3><a id="vis-ext" target="_blank" rel="noopener"><span class="lg">Ouvrir dans un nouvel onglet</span><span class="sm">Nouvel onglet</span> ↗</a><button class="puce" id="vis-x" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header><iframe id="vis-cadre" title="Visite virtuelle" allow="fullscreen; accelerometer; gyroscope; xr-spatial-tracking" allowfullscreen></iframe></div>
   <div class="sur" id="sur-vz" aria-hidden="true"><header><h3 id="vz-t"></h3><button class="lien hidden" id="vz-pdf"><span class="lg">Télécharger la fiche (PDF)</span><span class="sm">Télécharger (PDF)</span></button><button class="puce" id="vz-x" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
     <div id="vz"><img id="vz-img" alt="" draggable="false"></div>
@@ -825,32 +812,33 @@ function ouvrirFiche(id){
   const P=$('#pane-fiche');P.innerHTML=h;P.scrollTop=0;P.classList.add('on');
   $('#f-retour').onclick=fermerFiche;$('#f-hotel').onclick=()=>aller({niv:'aile',bat:L.bat});$('#f-plan').onclick=$('#f-vign').onclick=()=>ouvrirVisionneuse('Plan de vente · '+id,[L.plan],null);
   if(L.pages&&L.pages.length)$('#f-fiche').onclick=()=>ouvrirVisionneuse('Fiche du lot · '+id,L.pages,id);
-  if(L.visite){$('#f-vis').onclick=()=>plongerVisite(id);const pre=new Image();pre.src=L.visite+'apercu.jpg'}
+  if(L.visite)$('#f-vis').onclick=()=>plongerVisite(id);
   const S=setsEtg[etage];if(S)S.svg.querySelectorAll('.lot').forEach(p=>p.classList.toggle('sel',p.dataset.lot===id))}
 function fermerFiche(){selLot=null;$('#pane-fiche').classList.remove('on');const S=setsEtg[etage];if(S)S.svg.querySelectorAll('.lot').forEach(p=>p.classList.remove('sel'))}
 
 /* ------------------------------------------------------------------ visite, plan, fiche : surcouches plein écran */
 const sVis=$('#sur-visite'),sVz=$('#sur-vz'),frame=$('#vis-cadre');
-/* Plongée dans la visite : zoom sur le logement dans sa coupe (s'il y est affiché), cercle qui s'ouvre depuis le logement sur l'aperçu de la visite,
-   puis la visite à 360° en fondu ; le zoom de la coupe est rendu tel qu'il était. Mouvement réduit : ouverture directe. */
+/* Entrée dans la visite par le dessus (demande du 26/11/2026 : « on n'a pas l'impression d'entrer par le dessus ») : la coupe plonge sur le logement ;
+   la visite, chargée en même temps avec ?entree=dessus, s'ouvre en regardant le sol de la première pièce depuis le haut ; elle apparaît en fondu à la
+   fin de la plongée, puis se redresse jusqu'à sa vue de départ. Le zoom de la coupe est rendu tel qu'il était. Mouvement réduit : ouverture directe. */
 let plongeEnCours=false;
 function plongerVisite(id){const L=LOTS[id];if(!L||!L.visite||plongeEnCours)return;
   if(RM){ouvrirVisite(id);return}
-  plongeEnCours=true;const P=$('#plonge'),pv=P.querySelector('.pv'),av={z,tx,ty};
+  plongeEnCours=true;const av={z,tx,ty};let pret=false,plongee=false,fini=false;
   const p=niv==='etg'&&etage===L.k&&document.querySelector('.lots-svg.actif .lot[data-lot="'+id+'"]');
-  let x=innerWidth/2,y=innerHeight/2,attente=0;
-  if(p){const r=p.getBoundingClientRect(),c=cadre.getBoundingClientRect();x=r.left+r.width/2;y=r.top+r.height/2;p.classList.add('sel');
-    const cx=x-c.left,cy=y-c.top,z0=z,tx0=tx,ty0=ty,z1=Math.min(4,Math.max(z*2.4,2.6)),T0=performance.now(),D=820;attente=430;
-    (function pas(t){const u=Math.min(1,(t-T0)/D),e=u*u*u,nz=z0+(z1-z0)*e;tx=cx-(cx-tx0)*nz/z0;ty=cy-(cy-ty0)*nz/z0;z=nz;appliquerZoom();if(u<1)requestAnimationFrame(pas)})(T0)}
-  P.style.setProperty('--x',x+'px');P.style.setProperty('--y',y+'px');
-  const url=L.visite+'apercu.jpg';pv.style.backgroundImage='url("'+url+'")';
-  P.querySelector('.lib').innerHTML='<small>Visite virtuelle</small>'+esc(id)+' · '+esc(L.t)+' · '+fm(L.s)+' m²';
-  P.classList.remove('ouvre','part');P.classList.add('on');void P.offsetWidth;
-  const img=new Image();img.src=url;const pret=Promise.race([img.decode().catch(()=>{}),new Promise(r=>setTimeout(r,700))]);
-  setTimeout(()=>pret.then(()=>{P.classList.add('ouvre');
-    setTimeout(()=>{ouvrirVisite(id);let fini=false;const fin=()=>{if(fini)return;fini=true;P.classList.add('part');
-        z=av.z;tx=av.tx;ty=av.ty;appliquerZoom();setTimeout(()=>{P.classList.remove('on','ouvre','part');plongeEnCours=false},750)};
-      frame.addEventListener('load',()=>setTimeout(fin,900),{once:true});setTimeout(fin,4500)},1150)}),attente)}
+  const surMsg=e=>{if(e.source===frame.contentWindow&&e.data&&e.data.vv==='pret'){pret=true;essayer()}};
+  addEventListener('message',surMsg);
+  $('#vis-t').textContent='Visite virtuelle · '+id;$('#vis-ext').href=L.visite;frame.src=L.visite+'?entree=dessus';
+  function essayer(){if(fini||!pret||!plongee)return;fini=true;removeEventListener('message',surMsg);
+    sVis.classList.add('entree','on');sVis.setAttribute('aria-hidden','false');
+    setTimeout(()=>{try{frame.contentWindow.postMessage({vvp:'go'},'*')}catch(_){}},420);
+    setTimeout(()=>{z=av.z;tx=av.tx;ty=av.ty;appliquerZoom();sVis.classList.remove('entree');plongeEnCours=false},1400)}
+  if(p){const r=p.getBoundingClientRect(),c=cadre.getBoundingClientRect(),cx=r.left+r.width/2-c.left,cy=r.top+r.height/2-c.top;p.classList.add('sel');
+    const z0=z,tx0=tx,ty0=ty,z1=Math.min(3.6,Math.max(z*2.6,3.2)),T0=performance.now(),D=1150;
+    (function pas(t){const u=Math.min(1,(t-T0)/D),e=u*u*u,nz=z0+(z1-z0)*e;tx=cx-(cx-tx0)*nz/z0;ty=cy-(cy-ty0)*nz/z0;z=nz;appliquerZoom();
+      if(u>=.55&&!plongee){plongee=true;essayer()}if(u<1)requestAnimationFrame(pas)})(T0)}
+  else{plongee=true}
+  setTimeout(()=>{if(!fini){pret=true;plongee=true;essayer()}},7000)}
 function ouvrirVisite(id){const L=LOTS[id];$('#vis-t').textContent='Visite virtuelle · '+id;$('#vis-ext').href=L.visite;frame.src=L.visite;sVis.classList.add('on');sVis.setAttribute('aria-hidden','false')}
 function fermerVisite(){sVis.classList.remove('on');sVis.setAttribute('aria-hidden','true');setTimeout(()=>{if(!sVis.classList.contains('on'))frame.src='about:blank'},400)}
 $('#vis-x').onclick=fermerVisite;
