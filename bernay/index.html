@@ -1183,7 +1183,7 @@ function ouvrirSituation(pousse){
   sitOn=true;app.inert=true;app.classList.add('attente');app.classList.remove('apparait');$('#titre').classList.remove('entre');
   sit.classList.add('on');sit.setAttribute('aria-hidden','false');
   if(pousse===null){sit.classList.remove('fond')}else{sit.classList.add('fond')}
-  if(!sitChargee){sitChargee=true;if(SITHTML)sitF.srcdoc=SITHTML;else sitF.src='situation/situation.html?v=67da838b79'}
+  if(!sitChargee){sitChargee=true;if(SITHTML)sitF.srcdoc=SITHTML;else sitF.src='situation/situation.html?v=15ca9a82c9'}
   else{try{sitF.contentWindow.postMessage({sitp:'replay'},'*')}catch(e){}}
   /* filet : si la séquence ne répond pas (fichier absent), on rend la visionneuse */
   sitMinuteur=setTimeout(()=>{if(sitOn&&!sitPret)finSituation('skip')},12000)}

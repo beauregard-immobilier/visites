@@ -165,22 +165,28 @@ const WSTAR=[C.planW[0]+C.planK*(ca*dq[0]-sa*dq[1]), C.planW[1]+C.planK*(sa*dq[0
 // ---- fenêtre, zones sûres et cadrage de chaque chapitre ----
 let W=0,H=0,PORT=false,NARROW=false,CS=1,ZN=null,FR=[];
 function zone(i){const sh=H<520,nr=W<760;return{mt:sh?44:56,mb:i===3?(sh?124:150):(sh?74:100),ml:nr?16:28,mr:nr?16:28}}
-// Cadrage « cover » : l'image couvre toute la fenêtre ; l'échelle est la plus petite qui couvre, ou celle qui fait tenir la zone d'intérêt dans la zone sûre si elle est plus grande
-// (dans la limite de CAPS). Si la zone d'intérêt ne tient pas (fenêtre étroite), le cadrage balaie lentement de son début à sa fin (A vers B).
+// Cadrage : la zone d'intérêt tient toujours dans la zone sûre. L'image couvre toute la fenêtre quand cela ne coupe pas la zone d'intérêt (échelle la plus petite qui couvre, ou
+// plus grande, dans la limite de CAPS, pour remplir la zone sûre) ; sinon l'image est réduite jusqu'à ce que la zone d'intérêt tienne, et le fond de la séquence (couleur du bord de
+// l'image, bords fondus, vérifiés à la fabrication) remplit le reste. Plancher : la moitié de l'échelle qui couvre ; en deçà (fenêtre très étroite), le cadrage balaie lentement la zone
+// d'intérêt de son début à sa fin (A vers B). Erreur d'origine (Bernay, 27/11/2026, « trop zoomé, toute la page n'apparaît pas ») : l'image couvrait toujours la fenêtre ; sur une
+// fenêtre plus large ou plus basse que la carte, le haut et le bas de la zone d'intérêt sortaient de l'écran.
+const PLANCHER=.5;
 function frame(i){
   const o=zone(i),R0=C.interets[i],rot=(i===2&&PORT)?90:0;
   let w=IMGS[i][0],h=IMGS[i][1],R=R0;
   if(rot){const ih=IMGS[i][1];w=ih;h=IMGS[i][0];R=[ih-R0[3],R0[0],ih-R0[1],R0[2]]}    // plan tourné de 90° : coordonnées redressées (u = hauteur - y, v = x)
   const aw=W-o.ml-o.mr,ah=H-o.mt-o.mb,zx=o.ml+aw/2,zy=o.mt+ah/2;
   const sc=Math.max(W/w,H/h),sf=Math.min(aw/(R[2]-R[0]),ah/(R[3]-R[1]));
-  const s=Math.max(sc,Math.min(sf,sc*CAPS[i]));
-  const ax=(lo,hi,a,z,n,L)=>{const mn=z/s,mx=L-(n-z)/s,k=v=>clamp(v,mn,mx);
-    if((hi-lo)*s<=a+.5)return[k((lo+hi)/2),k((lo+hi)/2)];
+  const s=sf>=sc?Math.min(sf,sc*CAPS[i]):Math.max(sf,sc*PLANCHER);
+  const ax=(lo,hi,a,z,n,L)=>{const mn=z/s,mx=L-(n-z)/s,cou=mn<=mx,k=v=>cou?clamp(v,mn,mx):v;     // cou : l'image couvre la fenêtre dans ce sens
+    if((hi-lo)*s<=a+.5){
+      if(cou)return[k((lo+hi)/2),k((lo+hi)/2)];
+      const c=clamp(L/2-(n/2-z)/s,hi-a/(2*s),lo+a/(2*s));return[c,c]}      // image plus petite que la fenêtre : centrée, la zone d'intérêt restant dans la zone sûre
     return[k(lo+a/(2*s)),k(hi-a/(2*s))]};
   const X=ax(R[0],R[2],aw,zx,W,w),Y=ax(R[1],R[3],ah,zy,H,h);
   let K=[[X[0],Y[0]],[X[1],Y[1]]];
   const wp=C.balayage&&C.balayage[i];
-  if(wp&&Math.abs(X[0]-X[1])>2){const mn=zx/s,mx=w-(W-zx)/s;K=wp.map(x=>[clamp(x,mn,mx),Y[0]])}      // étapes choisies (carte régionale sur écran étroit)
+  if(wp&&Math.abs(X[0]-X[1])>2){const mn=zx/s,mx=w-(W-zx)/s;K=wp.map(x=>[mn<=mx?clamp(x,mn,mx):x,Y[0]])}      // étapes choisies (carte régionale sur écran étroit)
   return{rot,s,zx,zy,K,sweep:K.some(p=>Math.abs(p[0]-K[0][0])+Math.abs(p[1]-K[0][1])>2)};
 }
 function pose(i,d){
@@ -226,7 +232,7 @@ function proximite(M,k,ts){
 }
 function anneau(el,p,diam,op){
   if(op<=.004||!p){setS(el,"opacity","0");return}
-  el.style.transform=`translate(${p[0].toFixed(1)}px,${p[1].toFixed(1)}px) scale(${(diam/60).toFixed(3)})`;el.style.opacity=op.toFixed(3);
+  setS(el,"transform",`translate(${p[0].toFixed(1)}px,${p[1].toFixed(1)}px) scale(${(diam/60).toFixed(3)})`);setS(el,"opacity",op.toFixed(3));     // par setS, comme l'effacement : écrit directement, l'anneau restait figé à l'écran (le cache de setS croyait l'opacité déjà à 0)
 }
 function libelles(M,k){
   const pts=[[1055,668],[1665,667]];
